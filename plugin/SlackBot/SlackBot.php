@@ -73,6 +73,8 @@ class SlackBot extends PluginAbstract
 
         //For each user email, get the slack id
         foreach ($usersSubscribed as $subscribedUser) {
+
+            //Get the users slack id
             $emails[] = $subscribedUser["email"];
             $headers = array(
                 'Content-type: application/json',
@@ -87,25 +89,29 @@ class SlackBot extends PluginAbstract
             $result = curl_exec($c);
             $userSlackInformation = json_decode($result);
             $slackIds[] = $userSlackInformation->user->id;
+            $slackChannel = $userSlackInformation->user->id;
             curl_close($c);
+
+            //Send the message to the user as a slack bot
+            $paylod->text     = $username . " just uploaded a video\nVideo Name: " . $videoName . "\nVideo Link: " . $videoLink . "\nVideo Duration: " . $videoDuration . "\nSubscribers: " . json_encode($usersSubscribed);
+            $paylod->channel  = $slackChannel;
+            $message          = json_encode($paylod);
+            $headers = array(
+                'Content-type: application/json',
+                'Accept-Charset: UTF-8',
+                'Authorization: Bearer ' . $token,
+            );
+            $cBot                = curl_init('https://slack.com/api/chat.postMessage');
+            curl_setopt($cBot, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($cBot, CURLOPT_POST, true);
+            curl_setopt($cBot, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($cBot, CURLOPT_POSTFIELDS, $message);
+            curl_exec($cBot);
+            curl_close($cBot);
         }
         error_log("user emails " . json_encode($emails));
         error_log("user slack ids " . json_encode($slackIds));
 
-        $paylod->text     = $username . " just uploaded a video\nVideo Name: " . $videoName . "\nVideo Link: " . $videoLink . "\nVideo Duration: " . $videoDuration . "\nSubscribers: " . json_encode($usersSubscribed);
-        $paylod->channel  = $slackChannel;
-        $message          = json_encode($paylod);
-        $headers = array(
-            'Content-type: application/json',
-            'Accept-Charset: UTF-8',
-            'Authorization: Bearer ' . $token,
-        );
-        $c                = curl_init('https://slack.com/api/chat.postMessage');
-        curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($c, CURLOPT_POST, true);
-        curl_setopt($c, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($c, CURLOPT_POSTFIELDS, $message);
-        curl_exec($c);
-        curl_close($c);
+
     }
 }
