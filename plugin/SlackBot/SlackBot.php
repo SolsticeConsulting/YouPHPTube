@@ -12,7 +12,7 @@ class SlackBot extends PluginAbstract
 
     public function getDescription()
     {
-        return "Send video upload notifications to Users on Slack who have subscribed to the channel";
+        return "Send video upload notifications to Users on Slack who have subscribed to the channel via a Slack Bot.  The following scopes are required: \n-chat:write:bot \n-bot \n-users:read \n-users:read:email";
     }
 
     public function getName()
@@ -43,7 +43,6 @@ class SlackBot extends PluginAbstract
 
         $obj              = new stdClass();
         $obj->bot_user_oauth_access_token = "";
-        $obj->channel_id = "";
         return $obj;
     }
     public function afterNewVideo($videos_id)
@@ -68,14 +67,11 @@ class SlackBot extends PluginAbstract
         $videoDescription = $video->getDescription();
         $token            = $o->bot_user_oauth_access_token;
         $slackChannel     = $o->channel_id;
-        $slackIds         = array();
-        $emails           = array();
 
-        //For each user email, get the slack id
+        //For each user email, get the slack id, and post a message to the slack id
         foreach ($usersSubscribed as $subscribedUser) {
 
             //Get the users slack id
-            $emails[] = $subscribedUser["email"];
             $headers = array(
                 'Content-type: application/json',
                 'Accept-Charset: UTF-8',
@@ -88,12 +84,11 @@ class SlackBot extends PluginAbstract
             curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
             $result = curl_exec($c);
             $userSlackInformation = json_decode($result);
-            $slackIds[] = $userSlackInformation->user->id;
             $slackChannel = $userSlackInformation->user->id;
             curl_close($c);
 
             //Send the message to the user as a slack bot
-            $paylod->text     = $username . " just uploaded a video\nVideo Name: " . $videoName . "\nVideo Link: " . $videoLink . "\nVideo Duration: " . $videoDuration . "\nSubscribers: " . json_encode($usersSubscribed);
+            $paylod->text     = $username . " just uploaded a video\nVideo Name: " . $videoName . "\nVideo Link: " . $videoLink . "\nVideo Duration: " . $videoDuration . "\nSubscribers: ";
             $paylod->channel  = $slackChannel;
             $message          = json_encode($paylod);
             $headers = array(
@@ -101,7 +96,7 @@ class SlackBot extends PluginAbstract
                 'Accept-Charset: UTF-8',
                 'Authorization: Bearer ' . $token,
             );
-            $cBot                = curl_init('https://slack.com/api/chat.postMessage');
+            $cBot         = curl_init('https://slack.com/api/chat.postMessage');
             curl_setopt($cBot, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($cBot, CURLOPT_POST, true);
             curl_setopt($cBot, CURLOPT_HTTPHEADER, $headers);
@@ -109,8 +104,6 @@ class SlackBot extends PluginAbstract
             curl_exec($cBot);
             curl_close($cBot);
         }
-        error_log("user emails " . json_encode($emails));
-        error_log("user slack ids " . json_encode($slackIds));
 
 
     }
