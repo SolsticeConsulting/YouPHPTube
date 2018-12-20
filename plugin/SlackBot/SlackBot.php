@@ -69,39 +69,40 @@ class SlackBot extends PluginAbstract
 
         //For each user email, get the slack id, and post a message to the slack id
         foreach ($usersSubscribed as $subscribedUser) {
+            if ($subscribedUser["status"] == "a" && $subscribedUser["notify"] == true) {
+                //Get the users slack id
+                $headers = array(
+                    'Content-type: application/json',
+                    'Accept-Charset: UTF-8',
+                    'Authorization: Bearer ' . $token,
+                );
+                $c            = curl_init('https://slack.com/api/users.lookupByEmail?email=' . $subscribedUser["email"]);
+                curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($c, CURLOPT_HTTPHEADER, $headers);
+                curl_setopt($c, CURLOPT_POSTFIELDS, $message);
+                curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
+                $result = curl_exec($c);
+                $userSlackInformation = json_decode($result);
+                $slackChannel = $userSlackInformation->user->id;
+                curl_close($c);
 
-            //Get the users slack id
-            $headers = array(
-                'Content-type: application/json',
-                'Accept-Charset: UTF-8',
-                'Authorization: Bearer ' . $token,
-            );
-            $c            = curl_init('https://slack.com/api/users.lookupByEmail?email=' . $subscribedUser["email"]);
-            curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($c, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($c, CURLOPT_POSTFIELDS, $message);
-            curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
-            $result = curl_exec($c);
-            $userSlackInformation = json_decode($result);
-            $slackChannel = $userSlackInformation->user->id;
-            curl_close($c);
-
-            //Send the message to the user as a slack bot
-            $paylod->text     = $username . " just uploaded a video\nVideo Name: " . $videoName . "\nVideo Link: " . $videoLink . "\nVideo Duration: " . $videoDuration;
-            $paylod->channel  = $slackChannel;
-            $message          = json_encode($paylod);
-            $headers = array(
-                'Content-type: application/json',
-                'Accept-Charset: UTF-8',
-                'Authorization: Bearer ' . $token,
-            );
-            $cBot         = curl_init('https://slack.com/api/chat.postMessage');
-            curl_setopt($cBot, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($cBot, CURLOPT_POST, true);
-            curl_setopt($cBot, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($cBot, CURLOPT_POSTFIELDS, $message);
-            curl_exec($cBot);
-            curl_close($cBot);
+                //Send the message to the user as a slack bot
+                $paylod->text     = $username . " just uploaded a video\nVideo Name: " . $videoName . "\nVideo Link: " . $videoLink . "\nVideo Duration: " . $videoDuration;
+                $paylod->channel  = $slackChannel;
+                $message          = json_encode($paylod);
+                $headers = array(
+                    'Content-type: application/json',
+                    'Accept-Charset: UTF-8',
+                    'Authorization: Bearer ' . $token,
+                );
+                $cBot         = curl_init('https://slack.com/api/chat.postMessage');
+                curl_setopt($cBot, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($cBot, CURLOPT_POST, true);
+                curl_setopt($cBot, CURLOPT_HTTPHEADER, $headers);
+                curl_setopt($cBot, CURLOPT_POSTFIELDS, $message);
+                curl_exec($cBot);
+                curl_close($cBot);
+            }
         }
 
 
