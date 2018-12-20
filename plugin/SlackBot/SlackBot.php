@@ -72,14 +72,14 @@ class SlackBot extends PluginAbstract
         $emails           = array();
 
         //For each user email, get the slack id
-        foreach ($usersSubscribed as $email => $userEmail) {
-            $emails[] = $userEmail;
+        foreach ($usersSubscribed as $subscribedUser) {
+            $emails[] = $subscribedUser->$email;
             $headers = array(
                 'Content-type: application/json',
                 'Accept-Charset: UTF-8',
                 'Authorization: Bearer ' . $token,
             );
-            $c            = curl_init('https://slack.com/api/users.lookupByEmail?email=' . $userEmail);
+            $c            = curl_init('https://slack.com/api/users.lookupByEmail?email=' . $subscribedUser->$email);
             curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($c, CURLOPT_HTTPHEADER, $headers);
             curl_setopt($c, CURLOPT_POSTFIELDS, $message);
