@@ -6,7 +6,7 @@ if (!isset($global['systemRootPath'])) {
 }
 require_once $global['systemRootPath'] . 'plugin/Plugin.abstract.php';
 
-class SlackNotify extends PluginAbstract
+class SlackBot extends PluginAbstract
 {
 
     public function getDescription()
