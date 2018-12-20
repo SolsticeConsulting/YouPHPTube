@@ -56,14 +56,15 @@ class SlackBot extends PluginAbstract
         $usersSubString   = json_encode($usersSubscribed);
         error_log("Users Subscribed: " . $usersSubString);
         error_log("users id " . $users_id);
-        $username         = $user->getNameIdentification();
+        $username         = $user->getNameIdentification() ?? "A User";
         $channelName      = $user->getChannelName();
         $video            = new Video("", "", $videos_id);
-        $videoName        = $video->getTitle() ?? "";
+        $videoName        = $video->getTitle() ?? "Video Name Blank";
+        error_log("Video Name is: " . $videoName);
         $images           = Video::getImageFromFilename($video->getFilename());
         $videoThumbs      = $images->thumbsJpg;
-        $videoLink        = Video::getPermaLink($videos_id);
-        $videoDuration    = $video->getDuration() ?? "";
+        $videoLink        = Video::getPermaLink($videos_id) ?? "Video Link Not Found";
+        $videoDuration    = $video->getDuration() ?? "No Duration";
         $videoDescription = $video->getDescription();
         $token            = $o->bot_user_oauth_access_token;
         $slackChannel     = $o->channel_id;
@@ -73,6 +74,18 @@ class SlackBot extends PluginAbstract
         //For each user email, get the slack id
         foreach ($usersSubscribed as $email => $userEmail) {
             $emails[] = $userEmail;
+            $headers = array(
+                'Content-type: application/json',
+                'Accept-Charset: UTF-8',
+                'Authorization: Bearer ' . $token,
+            );
+            $c                = curl_init('https://slack.com/api/chat.postMessage');
+            curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($c, CURLOPT_POST, true);
+            curl_setopt($c, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($c, CURLOPT_POSTFIELDS, $message);
+            curl_exec($c);
+            curl_close($c);
         }
 
         $paylod->text     = $username . " just uploaded a video\nVideo Name: " . $videoName . "\nVideo Link: " . $videoLink . "\nVideo Duration: " . $videoDuration . "\nSubscribers: " . json_encode($usersSubscribed);
