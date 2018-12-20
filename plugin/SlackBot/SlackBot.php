@@ -66,7 +66,6 @@ class SlackBot extends PluginAbstract
         $videoDuration    = $video->getDuration();
         $videoDescription = $video->getDescription();
         $token            = $o->bot_user_oauth_access_token;
-        $slackChannel     = $o->channel_id;
 
         //For each user email, get the slack id, and post a message to the slack id
         foreach ($usersSubscribed as $subscribedUser) {
@@ -88,7 +87,7 @@ class SlackBot extends PluginAbstract
             curl_close($c);
 
             //Send the message to the user as a slack bot
-            $paylod->text     = $username . " just uploaded a video\nVideo Name: " . $videoName . "\nVideo Link: " . $videoLink . "\nVideo Duration: " . $videoDuration . "\nSubscribers: ";
+            $paylod->text     = $username . " just uploaded a video\nVideo Name: " . $videoName . "\nVideo Link: " . $videoLink . "\nVideo Duration: " . $videoDuration;
             $paylod->channel  = $slackChannel;
             $message          = json_encode($paylod);
             $headers = array(
