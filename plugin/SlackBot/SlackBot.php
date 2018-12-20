@@ -73,21 +73,22 @@ class SlackBot extends PluginAbstract
 
         //For each user email, get the slack id
         foreach ($usersSubscribed as $subscribedUser) {
+            error_log("subscribed user: " . $subscribedUser);
             $emails[] = $subscribedUser->$email;
-            $headers = array(
-                'Content-type: application/json',
-                'Accept-Charset: UTF-8',
-                'Authorization: Bearer ' . $token,
-            );
-            $c            = curl_init('https://slack.com/api/users.lookupByEmail?email=' . $subscribedUser->$email);
-            curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($c, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($c, CURLOPT_POSTFIELDS, $message);
-            curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
-            $result = curl_exec($c);
-            $userSlackInformation = json_decode($result);
-            $slackIds[] = $userSlackInformation->$user->$id;
-            curl_close($c);
+            // $headers = array(
+            //     'Content-type: application/json',
+            //     'Accept-Charset: UTF-8',
+            //     'Authorization: Bearer ' . $token,
+            // );
+            // $c            = curl_init('https://slack.com/api/users.lookupByEmail?email=' . $subscribedUser->$email);
+            // curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
+            // curl_setopt($c, CURLOPT_HTTPHEADER, $headers);
+            // curl_setopt($c, CURLOPT_POSTFIELDS, $message);
+            // curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
+            // $result = curl_exec($c);
+            // $userSlackInformation = json_decode($result);
+            // $slackIds[] = $userSlackInformation->$user->$id;
+            // curl_close($c);
         }
         error_log("user emails " . json_encode($emails));
         error_log("user slack ids " . json_encode($slackIds));
