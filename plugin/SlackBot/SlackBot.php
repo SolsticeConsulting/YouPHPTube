@@ -86,7 +86,7 @@ class SlackBot extends PluginAbstract
             curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
             $result = curl_exec($c);
             $userSlackInformation = json_decode($result);
-            $slackIds[] = $userSlackInformation["user"]["id"];
+            $slackIds[] = $userSlackInformation->user->id;
             curl_close($c);
         }
         error_log("user emails " . json_encode($emails));
