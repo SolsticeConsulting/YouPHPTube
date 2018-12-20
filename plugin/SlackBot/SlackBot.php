@@ -59,14 +59,22 @@ class SlackBot extends PluginAbstract
         $username         = $user->getNameIdentification();
         $channelName      = $user->getChannelName();
         $video            = new Video("", "", $videos_id);
-        $videoName        = $video->getTitle();
+        $videoName        = $video->getTitle() ?? "";
         $images           = Video::getImageFromFilename($video->getFilename());
         $videoThumbs      = $images->thumbsJpg;
         $videoLink        = Video::getPermaLink($videos_id);
-        $videoDuration    = $video->getDuration();
+        $videoDuration    = $video->getDuration() ?? "";
         $videoDescription = $video->getDescription();
         $token            = $o->bot_user_oauth_access_token;
         $slackChannel     = $o->channel_id;
+        $slackIds         = array();
+        $emails           = array();
+
+        //For each user email, get the slack id
+        foreach ($usersSubscribed as $email => $userEmail) {
+            $emails[] = $userEmail;
+        }
+
         $paylod->text     = $username . " just uploaded a video\nVideo Name: " . $videoName . "\nVideo Link: " . $videoLink . "\nVideo Duration: " . $videoDuration . "\nSubscribers: " . json_encode($usersSubscribed);
         $paylod->channel  = $slackChannel;
         $message          = json_encode($paylod);
