@@ -56,15 +56,15 @@ class SlackBot extends PluginAbstract
         $usersSubString   = json_encode($usersSubscribed);
         error_log("Users Subscribed: " . $usersSubString);
         error_log("users id " . $users_id);
-        $username         = $user->getNameIdentification() ?? "A User";
+        $username         = $user->getNameIdentification();
         $channelName      = $user->getChannelName();
         $video            = new Video("", "", $videos_id);
-        $videoName        = $video->getTitle() ?? "Video Name Blank";
+        $videoName        = $video->getTitle();
         error_log("Video Name is: " . $videoName);
         $images           = Video::getImageFromFilename($video->getFilename());
         $videoThumbs      = $images->thumbsJpg;
-        $videoLink        = Video::getPermaLink($videos_id) ?? "Video Link Not Found";
-        $videoDuration    = $video->getDuration() ?? "No Duration";
+        $videoLink        = Video::getPermaLink($videos_id);
+        $videoDuration    = $video->getDuration();
         $videoDescription = $video->getDescription();
         $token            = $o->bot_user_oauth_access_token;
         $slackChannel     = $o->channel_id;
@@ -79,14 +79,18 @@ class SlackBot extends PluginAbstract
                 'Accept-Charset: UTF-8',
                 'Authorization: Bearer ' . $token,
             );
-            $c                = curl_init('https://slack.com/api/chat.postMessage');
+            $c            = curl_init('https://slack.com/api/users.lookupByEmail?email=' . $userEmail);
             curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($c, CURLOPT_POST, true);
             curl_setopt($c, CURLOPT_HTTPHEADER, $headers);
             curl_setopt($c, CURLOPT_POSTFIELDS, $message);
-            curl_exec($c);
+            curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($c);
+            $userSlackInformation = json_decode($result);
+            $slackIds[] = $userSlackInformation->$user->$id;
             curl_close($c);
         }
+        error_log("user emails " . json_encode($emails));
+        error_log("user slack ids " . json_encode($slackIds));
 
         $paylod->text     = $username . " just uploaded a video\nVideo Name: " . $videoName . "\nVideo Link: " . $videoLink . "\nVideo Duration: " . $videoDuration . "\nSubscribers: " . json_encode($usersSubscribed);
         $paylod->channel  = $slackChannel;
