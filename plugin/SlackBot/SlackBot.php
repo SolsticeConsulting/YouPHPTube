@@ -53,7 +53,8 @@ class SlackBot extends PluginAbstract
         $users_id         = Video::getOwner($videos_id);
         $user             = new User($users_id);
         $usersSubscribed  = Subscribe::getAllSubscribes($users_id);
-        error_log("Users Subscribed: " . json_encode($usersSubscribed));
+        $usersSubString   = json_encode($usersSubscribed);
+        error_log("Users Subscribed: " . $usersSubString);
         error_log("users id " . $users_id);
         $username         = $user->getNameIdentification();
         $channelName      = $user->getChannelName();
@@ -66,7 +67,7 @@ class SlackBot extends PluginAbstract
         $videoDescription = $video->getDescription();
         $token            = $o->bot_user_oauth_access_token;
         $slackChannel     = $o->channel_id;
-        $paylod->text     = $username . " just uploaded a video\nVideo Name: " . $videoName . "\nVideo Link: " . $videoLink . "\nVideo Duration: " . $videoDuration . "\nSubscribers: " . json_encode($usersSubscribed);
+        $paylod->text     = $username . " just uploaded a video\nVideo Name: " . $videoName . "\nVideo Link: " . $videoLink . "\nVideo Duration: " . $videoDuration . "\nSubscribers: " . $usersSubString;
         $paylod->channel  = $slackChannel;
         $message          = json_encode($paylod);
         $headers = array(
