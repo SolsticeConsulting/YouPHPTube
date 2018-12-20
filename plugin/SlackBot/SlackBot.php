@@ -74,7 +74,7 @@ class SlackBot extends PluginAbstract
         //For each user email, get the slack id
         foreach ($usersSubscribed as $subscribedUser) {
             error_log("subscribed user: " . json_encode($subscribedUser));
-            $emails[] = $subscribedUser->$email;
+            $emails[] = $subscribedUser->email;
             // $headers = array(
             //     'Content-type: application/json',
             //     'Accept-Charset: UTF-8',
