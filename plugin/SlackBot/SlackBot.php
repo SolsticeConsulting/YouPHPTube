@@ -62,12 +62,9 @@ class SlackBot extends PluginAbstract
         $videoDescription = $video->getDescription();
         $token            = $o->bot_user_oauth_access_token;
         $slackChannel     = $o->channel_id;
-        $message          = array(
-            'payload' => json_encode(array(
-                'text' => $username . " just uploaded a video\nVideo Name: " . $videoName . "\nVideo Link: " . $videoLink . "\nVideo Duration: " . $videoDuration,
-                'channel' => $slackChannel
-            ))
-        );
+        $paylod->text     = $username . " just uploaded a video\nVideo Name: " . $videoName . "\nVideo Link: " . $videoLink . "\nVideo Duration: " . $videoDuration;
+        $paylod->channel  = $slackChannel;
+        $message          = json_encode($paylod);
         $headers = array(
             'Content-type: application/json',
             'Accept-Charset: UTF-8',
