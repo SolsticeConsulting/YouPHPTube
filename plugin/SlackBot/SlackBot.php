@@ -68,10 +68,15 @@ class SlackBot extends PluginAbstract
                 'channel' => $slackChannel
             ))
         );
+        $headers = array(
+            'Content-type: application/json',
+            'Accept-Charset: UTF-8',
+            'Authorization: Bearer ' . $token,
+        );
         $c                = curl_init('https://slack.com/api/chat.postMessage');
         curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($c, CURLOPT_POST, true);
-        curl_setopt($c.HTTPHEADER, ['Content-Type: application/json','Accept-Charset: UTF-8', 'Authorization: Bearer ' . $token]);
+        curl_setopt($c, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($c, CURLOPT_POSTFIELDS, $message);
         curl_exec($c);
         curl_close($c);
