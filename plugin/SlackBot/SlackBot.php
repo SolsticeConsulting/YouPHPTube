@@ -51,7 +51,7 @@ class SlackBot extends PluginAbstract
         $o                = $this->getDataObject();
         $users_id         = Video::getOwner($videos_id);
         $user             = new User($users_id);
-        $usersSubscribed  = new Subscribe($users_id);
+        $usersSubscribed  = Subscribe::getAllSubscribes($user_id);
         $username         = $user->getNameIdentification();
         $channelName      = $user->getChannelName();
         $video            = new Video("", "", $videos_id);
